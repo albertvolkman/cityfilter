@@ -1,0 +1,4 @@
+name = City Filter
+description = Alter the search form to convert City, State to Zipcode
+package = Custom
+core = 6.x

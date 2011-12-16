@@ -1,0 +1,27 @@
+<?php
+
+function cityfilter_form_views_exposed_form_alter(&$form, $form_state) {
+  if ($form_state['view']->name == 'property_listings') {
+    // Get search value
+    $search = $form_state['input']['distance']['postal_code'];
+  
+    // If its not a zipcode
+    if (!is_numeric($search)) {
+      // Break the query apart (for City, State)
+      $search = explode(',', $search);
+  
+      // Build query
+      $query = sprintf("SELECT zip FROM {zipcodes} WHERE city = LOWER('%s')", mysql_real_escape_string(strtolower(trim($search[0]))));
+      if (count($search) == 2) {
+        $query .= sprintf(" AND state = '%s'", mysql_real_escape_string(strtoupper(trim($search[1]))));
+      }
+      $query .= " LIMIT 1";
+  
+      // Run query
+      $zipcode = db_result(db_query($query));
+  
+      // Update view
+      $form_state['input']['distance']['postal_code'] = $zipcode;
+    }
+  }
+}
